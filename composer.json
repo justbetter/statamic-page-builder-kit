@@ -1,0 +1,40 @@
+{
+    "name": "justbetter/statamic-page-builder-kit",
+    "autoload": {
+        "psr-4": {
+            "Justbetter\\StatamicPageBuilderKit\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Justbetter\\StatamicPageBuilderKit\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "statamic/cms": "^5.0",
+        "tdwesten/statamic-builder": "^1.0",
+        "tormjens/eventy": "^0.9.4",
+        "rapidez/blade-directives": "^0.7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Statamic Page Builder Kit",
+            "description": "Statamic Page Builder Kit addon"
+        },
+        "laravel": {
+            "providers": [
+                "Justbetter\\StatamicPageBuilderKit\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
