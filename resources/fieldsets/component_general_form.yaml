@@ -1,0 +1,10 @@
+title: 'Component - General - Form'
+fields:
+  -
+    import: 'statamic-page-builder-kit::title'
+  -
+    handle: form
+    field:
+      max_items: 1
+      type: form
+      display: Formulier

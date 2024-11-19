@@ -1,0 +1,4 @@
+<!-- Available variables:
+- $title
+- $form
+-->

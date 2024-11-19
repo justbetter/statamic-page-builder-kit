@@ -20,8 +20,11 @@ class ServiceProvider extends AddonServiceProvider
         $this
             ->bootConfig()
             ->bootViews()
-            ->bootPageBuilder()
-            ->bootCollections();
+            ->bootPageBuilder();
+
+        if (config('justbetter.statamic-page-builder-kit.boot_collections', true)) {
+            $this->bootCollections();
+        }
     }
 
     public function bootConfig(): self
@@ -46,13 +49,16 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootCollections(): self
     {
+        // Try to find the existing pages collection
         $pagesCollection = CollectionFacade::findByHandle('pages');
 
+        // Create or update the pages collection if it doesn't exist or has no configuration file
         if (! $pagesCollection || ! File::exists($pagesCollection->path())) {
             if (! $pagesCollection) {
                 $pagesCollection = CollectionFacade::make('pages');
             }
 
+            // Set up the default configuration for the pages collection
             $pagesData = [
                 'title' => __('Pages'),
                 'sites' => array_keys(Site::all()->toArray()),
@@ -74,10 +80,12 @@ class ServiceProvider extends AddonServiceProvider
                 ],
             ];
 
+            // Write the configuration to the collection file
             $file = YAML::file($pagesCollection->path());
             File::put($pagesCollection->path(), $file->dump($pagesData));
         }
 
+        // Ensure the page blueprint exists, copy from package resources if it doesn't
         if (! Blueprint::find('collections/pages/page')) {
             $pageBlueprint = Blueprint::make('collections/pages/page');
             File::copyDirectory(__DIR__.'/../resources/blueprints/collections/pages/', File::dirname($pageBlueprint->path()));
@@ -88,7 +96,10 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootPageBuilder(): self
     {
+        // Get all available fieldsets
         $pageBuilderComponents = FieldsetFacade::all();
+        
+        // Filter and group the fieldsets that are marked as page builder components
         $pageBuilderComponents = $pageBuilderComponents
             ->filter(fn ($fieldset) => $this->fieldsetIsComponent($fieldset))
             ->mapToGroups(fn ($fieldset) => [
@@ -96,19 +107,23 @@ class ServiceProvider extends AddonServiceProvider
             ])
             ->toBase();
 
+        // Format the groups for display in the UI
         $groups = $pageBuilderComponents
             ->map(fn ($fieldsets, $group) => [
                 'display' => __(Str::headline($group)),
                 'sets' => $this->getGroupFieldsets($fieldsets),
             ])->toArray();
 
+        // Get the page builder fieldset from the package
         $pageBuilderFieldset = FieldsetFacade::find('statamic-page-builder-kit::page_builder');
         $pageBuilderContent = $pageBuilderFieldset?->contents();
 
+        // Update the fieldset with the newly organized component groups
         if (! empty($pageBuilderContent['fields']) && ! empty($pageBuilderContent['fields'][0]['field']['sets'])) {
             $pageBuilderContent['fields'][0]['field']['sets'] = $groups;
         }
 
+        // Save the updated fieldset configuration without triggering events
         $pageBuilderFieldset
             ?->setContents($pageBuilderContent ?? [])
             ?->saveQuietly();

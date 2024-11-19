@@ -1,0 +1,23 @@
+title: Title
+fields:
+  -
+    handle: title
+    field:
+      buttons:
+        - bold
+        - italic
+        - removeformat
+        - anchor
+        - h1
+        - h2
+        - h3
+        - h4
+        - h5
+        - h6
+        - underline
+        - strikethrough
+        - small
+      remove_empty_nodes: false
+      type: bard
+      display: Titel
+      localizable: true

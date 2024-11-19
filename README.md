@@ -4,11 +4,14 @@
 
 ## Features
 
-The page builder contains a:
+This addon adds the following features:
 
+- Pages Collection
 - Hero Banner Component
 - Text Component
+- Image + text Component
 - USP Component
+- Form Component
 
 ## Install
 
@@ -18,19 +21,17 @@ composer require justbetter/statamic-page-builder-kit
 
 ## How to Use
 
-Simply install the addon and add the `component_page_builder` fieldset to a blueprint.
-You can use the page builder by including it like this:
+When making use of the collections provided by this addon, the page builder will already be generated for you.
+If you want to add the page builder to an existing blueprint, you can do so by adding the `statamic-page-builder-kit::page_builder` fieldset to the blueprint.
+You can use the page builder in your templates by including it like this:
 
 ``` blade
-@include('statamic-page-builder::page_builder')
+@include('statamic-page-builder-kit::page_builder')
 ```
 
 ## Todo
 
-- Add Pages Collection
-- Add Form Component
 - Add image slider Component
-- Add image + text Component
 - Add CTA blocks Component
 - Add accordeon Component
 - Add Blog collection + category taxonomy + Component (Add-on)
