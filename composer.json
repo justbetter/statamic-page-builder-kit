@@ -11,16 +11,34 @@
         }
     },
     "require": {
+        "php": "^8.1|^8.2|^8.3",
         "statamic/cms": "^5.0",
         "tormjens/eventy": "^0.9.4",
         "rapidez/blade-directives": "^0.7.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0"
+        "laravel/pint": "^1.7",
+        "larastan/larastan": "^2.5",
+        "phpstan/phpstan-mockery": "^1.1",
+        "phpunit/phpunit": "^10.1",
+        "orchestra/testbench": "^8.0|^9.0",
+        "pestphp/pest": "^2.0"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan",
+        "style": "pint --test",
+        "quality": [
+            "@test",
+            "@analyse",
+            "@style"
+        ],
+        "fix-style": "pint"
     },
     "config": {
         "allow-plugins": {
-            "pixelfear/composer-dist-plugin": true
+            "pixelfear/composer-dist-plugin": true,
+            "pestphp/pest-plugin": true
         }
     },
     "extra": {
@@ -34,6 +52,6 @@
             ]
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
