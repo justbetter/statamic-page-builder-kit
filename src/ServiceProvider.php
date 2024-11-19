@@ -2,14 +2,14 @@
 
 namespace Justbetter\StatamicPageBuilderKit;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection as CollectionFacade;
-use Illuminate\Support\Collection;
 use Statamic\Facades\Fieldset as FieldsetFacade;
-use Statamic\Fields\Fieldset;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
+use Statamic\Fields\Fieldset;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Support\Str;
 
@@ -27,7 +27,7 @@ class ServiceProvider extends AddonServiceProvider
     public function bootConfig(): self
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/statamic-page-builder-kit.php',
+            __DIR__.'/../config/statamic-page-builder-kit.php',
             'justbetter.statamic-page-builder-kit'
         );
 
@@ -36,9 +36,9 @@ class ServiceProvider extends AddonServiceProvider
 
     public function bootViews(): self
     {
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'statamic-page-builder-kit');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'statamic-page-builder-kit');
         $this->publishes([
-            __DIR__ . '/../resources/views' => resource_path('views/vendor/justbetter/statamic-page-builder-kit'),
+            __DIR__.'/../resources/views' => resource_path('views/vendor/justbetter/statamic-page-builder-kit'),
         ], 'statamic-page-builder-kit');
 
         return $this;
@@ -48,8 +48,8 @@ class ServiceProvider extends AddonServiceProvider
     {
         $pagesCollection = CollectionFacade::findByHandle('pages');
 
-        if (!$pagesCollection || !File::exists($pagesCollection->path())) {
-            if (!$pagesCollection) {
+        if (! $pagesCollection || ! File::exists($pagesCollection->path())) {
+            if (! $pagesCollection) {
                 $pagesCollection = CollectionFacade::make('pages');
             }
 
@@ -67,10 +67,10 @@ class ServiceProvider extends AddonServiceProvider
                         'label' => 'Entry',
                         'url' => '{permalink}',
                         'refresh' => true,
-                    ]
+                    ],
                 ],
                 'structure' => [
-                    'root' => true
+                    'root' => true,
                 ],
             ];
 
@@ -78,9 +78,9 @@ class ServiceProvider extends AddonServiceProvider
             File::put($pagesCollection->path(), $file->dump($pagesData));
         }
 
-        if (!Blueprint::find('collections/pages/page')) {
+        if (! Blueprint::find('collections/pages/page')) {
             $pageBlueprint = Blueprint::make('collections/pages/page');
-            File::copyDirectory(__DIR__ . '/../resources/blueprints/collections/pages/', File::dirname($pageBlueprint->path()));
+            File::copyDirectory(__DIR__.'/../resources/blueprints/collections/pages/', File::dirname($pageBlueprint->path()));
         }
 
         return $this;
@@ -90,28 +90,28 @@ class ServiceProvider extends AddonServiceProvider
     {
         $pageBuilderComponents = FieldsetFacade::all();
         $pageBuilderComponents = $pageBuilderComponents
-            ->filter(fn($fieldset) => $this->fieldsetIsComponent($fieldset))
+            ->filter(fn ($fieldset) => $this->fieldsetIsComponent($fieldset))
             ->mapToGroups(fn ($fieldset) => [
-                $this->getFieldsetGroup($fieldset) => [$this->getFieldsetName($fieldset) => $fieldset]
+                $this->getFieldsetGroup($fieldset) => [$this->getFieldsetName($fieldset) => $fieldset],
             ])
             ->toBase();
 
         $groups = $pageBuilderComponents
             ->map(fn ($fieldsets, $group) => [
                 'display' => __(Str::headline($group)),
-                'sets' => $this->getGroupFieldsets($fieldsets)
+                'sets' => $this->getGroupFieldsets($fieldsets),
             ])->toArray();
 
         $pageBuilderFieldset = FieldsetFacade::find('statamic-page-builder-kit::page_builder');
-        $pageBuilderContent = $pageBuilderFieldset->contents();
+        $pageBuilderContent = $pageBuilderFieldset?->contents();
 
-        if (!empty($pageBuilderContent['fields']) && !empty($pageBuilderContent['fields'][0]['field']['sets'])) {
+        if (! empty($pageBuilderContent['fields']) && ! empty($pageBuilderContent['fields'][0]['field']['sets'])) {
             $pageBuilderContent['fields'][0]['field']['sets'] = $groups;
         }
 
         $pageBuilderFieldset
-            ->setContents($pageBuilderContent)
-            ->saveQuietly();
+            ?->setContents($pageBuilderContent ?? [])
+            ?->saveQuietly();
 
         return $this;
     }
@@ -119,6 +119,7 @@ class ServiceProvider extends AddonServiceProvider
     protected function fieldsetIsComponent(Fieldset $fieldset): bool
     {
         $handle = $this->getFieldsetHandle($fieldset);
+
         return Str::startsWith($handle, 'component_');
     }
 
@@ -128,14 +129,14 @@ class ServiceProvider extends AddonServiceProvider
             $fieldset = collect($fieldset)->first();
 
             return [
-                $this->getFieldsetGroup($fieldset) . '_' . $this->getFieldsetName($fieldset) => [
+                $this->getFieldsetGroup($fieldset).'_'.$this->getFieldsetName($fieldset) => [
                     'display' => __(Str::headline($this->getFieldsetName($fieldset))),
                     'fields' => [
                         [
-                            'import' => $fieldset->handle()
-                        ]
+                            'import' => $fieldset->handle(),
+                        ],
                     ],
-                ]
+                ],
             ];
         })->toBase();
 

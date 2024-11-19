@@ -1,4 +1,4 @@
-# Statamic Page Builder
+# Statamic Page Builder Kit
 
 > This addon adds a page builder fieldset with some components.
 
@@ -13,7 +13,7 @@ The page builder contains a:
 ## Install
 
 ``` bash
-composer require justbetter/statamic-page-builder
+composer require justbetter/statamic-page-builder-kit
 ```
 
 ## How to Use
