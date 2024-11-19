@@ -12,7 +12,6 @@
     },
     "require": {
         "statamic/cms": "^5.0",
-        "tdwesten/statamic-builder": "^1.0",
         "tormjens/eventy": "^0.9.4",
         "rapidez/blade-directives": "^0.7.0"
     },

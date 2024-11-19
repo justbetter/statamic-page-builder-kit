@@ -1,0 +1,41 @@
+title: 'Button'
+fields:
+    -
+      handle: button_text
+      field:
+        input_type: text
+        antlers: false
+        type: text
+        display: 'Knop - Tekst'
+        localizable: true
+        listable: hidden
+        instructions_position: above
+        visibility: visible
+        replicator_preview: true
+        hide_display: false
+    -
+      handle: button_url
+      field:
+        collections:
+          - pages
+        type: link
+        display: 'Knop - URL'
+        localizable: true
+        listable: hidden
+        instructions_position: above
+        visibility: visible
+        replicator_preview: true
+        hide_display: false
+    -
+      handle: button_open_in_new_tab
+      field:
+        default: false
+        type: toggle
+        display: 'Knop - Openen in nieuw tabblad'
+        localizable: true
+        listable: hidden
+        instructions_position: above
+        visibility: visible
+        replicator_preview: true
+        hide_display: false
+        width: 50

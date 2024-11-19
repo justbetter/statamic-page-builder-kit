@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ffd2d7e81f8d3b5aa748d2180be3e33",
+    "content-hash": "4ebc2959b0a052131940206a27ae11da",
     "packages": [
         {
             "name": "ajthinking/archetype",
@@ -6902,59 +6902,6 @@
                 }
             ],
             "time": "2024-09-25T14:20:29+00:00"
-        },
-        {
-            "name": "tdwesten/statamic-builder",
-            "version": "v1.0.9",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tdwesten/statamic-builder.git",
-                "reference": "189e0f8cb1390b30a29bf4ccb15c3375a41f95ab"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tdwesten/statamic-builder/zipball/189e0f8cb1390b30a29bf4ccb15c3375a41f95ab",
-                "reference": "189e0f8cb1390b30a29bf4ccb15c3375a41f95ab",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^10.0|^11.0",
-                "laravel/framework": "^10.0|^11.0",
-                "php": "^8.2",
-                "statamic/cms": "^4.46|^5.0"
-            },
-            "require-dev": {
-                "laravel/pint": "^1.7",
-                "orchestra/testbench": "^8.0",
-                "pestphp/pest": "^2.33",
-                "pestphp/pest-plugin-laravel": "^2.2",
-                "spatie/laravel-ray": "^1.36",
-                "statamic/eloquent-driver": "^3.4"
-            },
-            "type": "library",
-            "extra": {
-                "statamic": {
-                    "name": "Statamic Builder",
-                    "description": "Statamic Builder addon"
-                },
-                "laravel": {
-                    "providers": [
-                        "Tdwesten\\StatamicBuilder\\ServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Tdwesten\\StatamicBuilder\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "A fluent blueprint and fieldset builder for Statamic.",
-            "support": {
-                "issues": "https://github.com/tdwesten/statamic-builder/issues",
-                "source": "https://github.com/tdwesten/statamic-builder/tree/v1.0.9"
-            },
-            "time": "2024-10-15T07:16:26+00:00"
         },
         {
             "name": "thecodingmachine/safe",

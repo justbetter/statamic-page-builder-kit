@@ -3,56 +3,25 @@
 namespace Justbetter\StatamicPageBuilderKit;
 
 use Illuminate\Support\Facades\File;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection as CollectionFacade;
+use Illuminate\Support\Collection;
+use Statamic\Facades\Fieldset as FieldsetFacade;
+use Statamic\Fields\Fieldset;
+use Statamic\Facades\Site;
+use Statamic\Facades\YAML;
 use Statamic\Providers\AddonServiceProvider;
-use Justbetter\StatamicPageBuilderKit\Blueprints\PageBlueprint;
+use Statamic\Support\Str;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    protected array $baseCollections = [];
-    protected array $baseFieldsets = [];
-
-    public function register(): void
-    {
-        parent::register();
-        $this->registerPageBuilder();
-    }
-
-    public function registerPageBuilder(): self
-    {
-        $this->baseCollections = $this->getClassesByPath(
-            __DIR__ . '/Collections',
-            'Justbetter\\StatamicPageBuilderKit\\'
-        );
-
-        $this->baseFieldsets = $this->getClassesByPath(
-            __DIR__ . '/Fieldsets',
-            'Justbetter\\StatamicPageBuilderKit\\'
-        );
-
-        return $this;
-    }
-
     public function bootAddon(): void
     {
         $this
             ->bootConfig()
-            ->bootViews();
-
-        config(['statamic.builder.collections' => array_merge(
-            $this->baseCollections,
-            config('statamic.builder.collections') ?? []
-        )]);
-
-        config(['statamic.builder.blueprints' => [
-            'collections.pages' => [
-                'page' => PageBlueprint::class,
-            ],
-        ]]);
-
-        config(['statamic.builder.fieldsets' => array_merge(
-            $this->baseFieldsets,
-            config('statamic.builder.fieldsets') ?? []
-        )]);
+            ->bootViews()
+            ->bootPageBuilder()
+            ->bootCollections();
     }
 
     public function bootConfig(): self
@@ -75,16 +44,127 @@ class ServiceProvider extends AddonServiceProvider
         return $this;
     }
 
-    protected function getClassesByPath(string $path, string $classPath): array
+    public function bootCollections(): self
     {
-        $classes = [];
-        foreach (File::allFiles($path) as $file) {
-            $relativePath = str_replace([$path . '/', '.php'], '', $file->getPathname());
-            $fieldsetClass = $classPath . basename($path) . '\\' . str_replace('/', '\\', $relativePath);
-            if (class_exists($fieldsetClass)) {
-                $classes[] = $fieldsetClass;
+        $pagesCollection = CollectionFacade::findByHandle('pages');
+
+        if (!$pagesCollection || !File::exists($pagesCollection->path())) {
+            if (!$pagesCollection) {
+                $pagesCollection = CollectionFacade::make('pages');
             }
+
+            $pagesData = [
+                'title' => __('Pages'),
+                'sites' => array_keys(Site::all()->toArray()),
+                'propagate' => false,
+                'template' => 'statamic-page-builder-kit::page',
+                'layout' => 'layout',
+                'revisions' => false,
+                'route' => '{parent_uri}/{slug}',
+                'sort_dir' => 'asc',
+                'preview_targets' => [
+                    [
+                        'label' => 'Entry',
+                        'url' => '{permalink}',
+                        'refresh' => true,
+                    ]
+                ],
+                'structure' => [
+                    'root' => true
+                ],
+            ];
+
+            $file = YAML::file($pagesCollection->path());
+            File::put($pagesCollection->path(), $file->dump($pagesData));
         }
-        return $classes;
+
+        if (!Blueprint::find('collections/pages/page')) {
+            $pageBlueprint = Blueprint::make('collections/pages/page');
+            File::copyDirectory(__DIR__ . '/../resources/blueprints/collections/pages/', File::dirname($pageBlueprint->path()));
+        }
+
+        return $this;
+    }
+
+    public function bootPageBuilder(): self
+    {
+        $pageBuilderComponents = FieldsetFacade::all();
+        $pageBuilderComponents = $pageBuilderComponents
+            ->filter(fn($fieldset) => $this->fieldsetIsComponent($fieldset))
+            ->mapToGroups(fn ($fieldset) => [
+                $this->getFieldsetGroup($fieldset) => [$this->getFieldsetName($fieldset) => $fieldset]
+            ])
+            ->toBase();
+
+        $groups = $pageBuilderComponents
+            ->map(fn ($fieldsets, $group) => [
+                'display' => __(Str::headline($group)),
+                'sets' => $this->getGroupFieldsets($fieldsets)
+            ])->toArray();
+
+        $pageBuilderFieldset = FieldsetFacade::find('statamic-page-builder-kit::page_builder');
+        $pageBuilderContent = $pageBuilderFieldset->contents();
+
+        if (!empty($pageBuilderContent['fields']) && !empty($pageBuilderContent['fields'][0]['field']['sets'])) {
+            $pageBuilderContent['fields'][0]['field']['sets'] = $groups;
+        }
+
+        $pageBuilderFieldset
+            ->setContents($pageBuilderContent)
+            ->saveQuietly();
+
+        return $this;
+    }
+
+    protected function fieldsetIsComponent(Fieldset $fieldset): bool
+    {
+        $handle = $this->getFieldsetHandle($fieldset);
+        return Str::startsWith($handle, 'component_');
+    }
+
+    protected function getGroupFieldsets(Collection $fieldsets): array
+    {
+        $sets = $fieldsets->mapWithKeys(function ($fieldset) {
+            $fieldset = collect($fieldset)->first();
+
+            return [
+                $this->getFieldsetGroup($fieldset) . '_' . $this->getFieldsetName($fieldset) => [
+                    'display' => __(Str::headline($this->getFieldsetName($fieldset))),
+                    'fields' => [
+                        [
+                            'import' => $fieldset->handle()
+                        ]
+                    ],
+                ]
+            ];
+        })->toBase();
+
+        return $sets->toArray();
+    }
+
+    protected function getFieldsetGroup(Fieldset $fieldset): string
+    {
+        $handle = $this->getFieldsetHandle($fieldset);
+        $group = explode('_', $handle);
+
+        return $group[1] ?? '';
+    }
+
+    protected function getFieldsetName(Fieldset $fieldset): string
+    {
+        $handle = $this->getFieldsetHandle($fieldset);
+        $parts = explode('_', $handle);
+
+        return implode('_', array_slice($parts, 2));
+    }
+
+    protected function getFieldsetHandle(Fieldset $fieldset): string
+    {
+        $handle = $fieldset->handle();
+        if ($fieldset->isNamespaced()) {
+            $handle = Str::after($fieldset->handle(), '::');
+        }
+
+        return $handle;
     }
 }
