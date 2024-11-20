@@ -19,6 +19,12 @@ This addon adds the following features:
 composer require justbetter/statamic-page-builder-kit
 ```
 
+After installation, run the following command to set up the Pages collection with a default blueprint:
+
+``` bash
+php artisan page-builder-kit:register-pages-collection
+```
+
 ## How to Use
 
 When making use of the collections provided by this addon, the page builder will already be generated for you.
