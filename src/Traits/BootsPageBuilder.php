@@ -5,11 +5,11 @@ namespace Justbetter\StatamicPageBuilderKit\Traits;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Justbetter\StatamicPageBuilderKit\Listeners\FieldsetSavedListener;
 use Statamic\Events\FieldsetSaved;
 use Statamic\Facades\Fieldset as FieldsetFacade;
 use Statamic\Fields\Fieldset;
 use Statamic\Support\Str;
-use Justbetter\StatamicPageBuilderKit\Listeners\FieldsetSavedListener;
 
 trait BootsPageBuilder
 {
@@ -21,14 +21,14 @@ trait BootsPageBuilder
         return $this;
     }
 
-    public function bootPageBuilderFieldset(): self 
+    public function bootPageBuilderFieldset(): self
     {
         $cacheKey = 'statamic-page-builder-kit.page-builder-components';
 
         $pageBuilderContent = Cache::rememberForever($cacheKey, function () {
             // Get all available fieldsets
             $pageBuilderComponents = FieldsetFacade::all();
-            
+
             // Filter and group the fieldsets that are marked as page builder components
             $pageBuilderComponents = $pageBuilderComponents
                 ->filter(fn ($fieldset) => $this->fieldsetIsComponent($fieldset))
@@ -61,14 +61,14 @@ trait BootsPageBuilder
             ?->setContents($pageBuilderContent)
             ?->saveQuietly();
 
-        return $this;    
+        return $this;
     }
 
-    public function bootPageBuilderListeners(): self 
+    public function bootPageBuilderListeners(): self
     {
         Event::listen(FieldsetSaved::class, FieldsetSavedListener::class);
 
-        return $this;    
+        return $this;
     }
 
     protected function fieldsetIsComponent(Fieldset $fieldset): bool

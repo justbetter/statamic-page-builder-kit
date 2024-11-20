@@ -72,13 +72,13 @@ class RegisterPagesCollectionCommand extends Command
 
         if (! $blueprint || ! File::exists($blueprint->path())) {
             $blueprintContents = File::get(__DIR__.'/../../resources/blueprints/collections/pages/page.yaml');
-            
+
             if (! File::exists(Blueprint::directory().'/collections/pages')) {
                 File::makeDirectory(Blueprint::directory().'/collections/pages', 0755, true);
             }
 
             File::put(Blueprint::directory().'/collections/pages/page.yaml', $blueprintContents);
-            
+
             $this->info('Created pages blueprint.');
         }
     }

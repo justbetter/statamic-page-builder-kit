@@ -2,9 +2,9 @@
 
 namespace Justbetter\StatamicPageBuilderKit;
 
-use Statamic\Providers\AddonServiceProvider;
-use Justbetter\StatamicPageBuilderKit\Traits\BootsPageBuilder;
 use Justbetter\StatamicPageBuilderKit\Commands\RegisterPagesCollectionCommand;
+use Justbetter\StatamicPageBuilderKit\Traits\BootsPageBuilder;
+use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
