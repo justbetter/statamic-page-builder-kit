@@ -1,0 +1,16 @@
+title: 'Page builder'
+fields:
+  -
+    handle: page_builder
+    field:
+      collapse: true
+      display: 'Page Builder'
+      type: replicator
+      localizable: true
+      sets:
+        new_set_group:
+          display: 'New Set Group'
+          sets:
+            new_set:
+              display: 'New Set'
+              fields: {  }

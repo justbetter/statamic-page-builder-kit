@@ -1,0 +1,24 @@
+title: 'Component - Text'
+fields:
+  -
+    handle: text
+    field:
+      buttons:
+        - h2
+        - h3
+        - bold
+        - italic
+        - unorderedlist
+        - orderedlist
+        - removeformat
+        - anchor
+        - h1
+        - h4
+        - h5
+        - h6
+        - underline
+        - strikethrough
+        - small
+      remove_empty_nodes: false
+      type: bard
+      display: Tekst
